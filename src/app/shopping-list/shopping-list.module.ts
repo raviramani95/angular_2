@@ -15,7 +15,8 @@ import { ShoppingListComponent } from "./shopping-list.component";
     imports: [
         FormsModule,
         RouterModule.forChild([
-            {path: 'shopping-list', component: ShoppingListComponent}
+            // {path: 'shopping-list', component: ShoppingListComponent},
+            {path: '', component: ShoppingListComponent}
         ]),
         SharedModule
     ]

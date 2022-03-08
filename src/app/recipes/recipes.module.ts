@@ -36,6 +36,6 @@ import { RecipesComponent } from "./recipes.component";
     //     RecipeEditComponent,
     // ]
 })
-export class RecipeModule{
+export class RecipesModule{
 
 }
