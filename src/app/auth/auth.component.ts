@@ -1,7 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { Form, NgForm } from '@angular/forms';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {  NgForm } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
+// import { AlertComponent } from '../shared/alert/alert.component';
+// import { PlaceholderDirective } from '../shared/placeholder/placeholder.directive';
 import { AuthResponseData, AuthService } from './auth.service';
 
 @Component({
@@ -9,10 +11,13 @@ import { AuthResponseData, AuthService } from './auth.service';
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css']
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy{
   isLoginMode = true;
   isLoading = false;
   error: string = null;
+  // @ViewChild(PlaceholderDirective, {static:false}) alertHost: PlaceholderDirective;
+
+  private closeSub: Subscription;
 
   constructor(private authService: AuthService,private router: Router,
       private route: ActivatedRoute) { }
@@ -48,11 +53,41 @@ export class AuthComponent implements OnInit {
         }, errorMessage => {
           console.log(errorMessage);
           this.error = errorMessage;
+          // this.showErrorAlert(errorMessage);
           this.isLoading = false;
         }
     );
       form.reset();
   }
     
+  onHandleError(){
+    this.error = null;
+  }
+
+  // private showErrorAlert(message: string){
+  //   const alertCF = this.componentFactoryResolver.resolveComponentFactory(AlertComponent);
+  //   const hostViewContainerRef = this.alertHost.viewContainerRef;
+  //   hostViewContainerRef.clear();
+
+  //   const componentRef = hostViewContainerRef.createComponent(alertCF);
+  //   componentRef.instance.message = message;
+  //   this.closeSub = componentRef.instance.close.subscribe(() => {
+  //     this.closeSub.unsubscribe();
+  //     hostViewContainerRef.clear();
+  //   });
+  // }
+  // private showErrorAlert(errorMessage: string) {
+  //   const hostViewContainerRef = this.alertHost.viewContainerRef;
+  //   hostViewContainerRef.clear();
+  //   hostViewContainerRef.createComponent(AlertComponent);
+  // }
+
+  ngOnDestroy(): void {
+    if(this.closeSub){
+      this.closeSub.unsubscribe();
+    }
+  }
+
+  
 }
 
