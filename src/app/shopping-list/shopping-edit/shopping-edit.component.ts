@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { Ingredient } from 'src/app/shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list.service';
 import * as ShoppingListActions from '../store/shopping-list.actions';
+import * as fromApp from '../store/shopping-list.reducer';
 // import { EventEmitter } from 'stream';
 
 @Component({
@@ -20,20 +21,22 @@ export class ShoppingEditComponent implements OnInit, OnDestroy{
   editedItem: Ingredient;
   
   constructor(private shoppingListService: ShoppingListService,
-    private store: Store<{ shoppingList : { ingredients : Ingredient[] }}> ) { }
+    private store: Store<fromApp.AppState> ) { }
 
   ngOnInit(): void {
-    this.subscription = this.shoppingListService.startedEditing.subscribe(
-      (index: number) => {
-        this.editeditemIndex = index;
+    this.subscription = this.store.select('shoppingList').subscribe(stateData => {
+      if(stateData.editedIngredientIndex > -1){
         this.editMode = true;
-        this.editedItem = this.shoppingListService.getIngredient(index);
+        this.editedItem = stateData.editedIngredient;
+        this.editeditemIndex = stateData.editedIngredientIndex;
         this.slForm.setValue({
           name: this.editedItem.name,
           amount: this.editedItem.amount
         });
+      }else{
+        this.editMode = false;
       }
-    );
+    });
   }
   onSubmit(form: NgForm){
     const value = form.value;
@@ -58,17 +61,16 @@ export class ShoppingEditComponent implements OnInit, OnDestroy{
   onClear(){
     this.slForm.reset();
     this.editMode = false;
+    this.store.dispatch(new ShoppingListActions.StopEdit());
   }
 
   onDelete(){
-    if(this.editMode){
-      // this.shoppingListService.deleteIngredient(this.editeditemIndex);
-      this.store.dispatch(new ShoppingListActions.DeleteIngredient(this.editeditemIndex));
-      this.onClear();
-    }
+    this.store.dispatch(new ShoppingListActions.DeleteIngredient(this.editeditemIndex));
+    this.onClear();
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.store.dispatch(new ShoppingListActions.StopEdit());
   }
 }
