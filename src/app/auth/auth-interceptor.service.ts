@@ -4,7 +4,6 @@ import { Store } from "@ngrx/store";
 import { exhaustMap, map, Observable, take } from "rxjs";
 import { AuthService } from "./auth.service";
 import * as fromApp from "../store/app.reducer";
-import * as AuthActions from "./store/auth.actions";
 
 @Injectable()
 export class AuthInterceptorService implements HttpInterceptor{
